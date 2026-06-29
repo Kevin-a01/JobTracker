@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+dialog[open] {
+  animation: slide-up 0.3s ease-out;
+}
+/* dialog:not([open]) {
+  transition:
+    display 0.3s allow-discrete,
+    overlay 0.3s allow-discrete;
+  animation: slide-down 0.3s ease-out;
+}
+
+@keyframes slide-down {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+} */
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
