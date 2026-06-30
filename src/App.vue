@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted} from "vue";
 import { supabase } from "../utils/supabase";
 import { BriefcaseBusinessIcon, Plus, X } from "@lucide/vue";
+
 
 type jobtype = {
   id: number;
@@ -22,7 +23,65 @@ async function getJobs() {
   console.log("Error", error);
 }
 
-getJobs();
+
+
+const form = ref({
+  company: "",
+  title: "",
+  created_at: new Date().toISOString().split("T")[0],
+  status: "",
+  url: "",
+});
+
+const resetForm = () => {
+  form.value = {
+     company: "",
+    title: "",
+    created_at: new Date().toISOString().split("T")[0],
+    status: "",
+    url: "",
+  }
+}
+
+const InsertJob = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("jobs")
+      .insert([
+        {
+          company: form.value.company,
+          title: form.value.title,
+          created_at: form.value.created_at,
+          status: form.value.status,
+          url: form.value.url,
+        },
+      ])
+      .select();
+    if (error) {
+      throw new Error();
+    }
+    console.log("Ansökan sparad", data);
+
+    await getJobs();
+
+    resetForm()
+    dialogRef.value?.close();
+  } catch (error) {
+    console.error("Kunde inte spara datan", error);
+  }
+};
+
+onMounted(() => {
+  getJobs();
+})
+
+const dialogRef = ref<HTMLDialogElement | null>(null);
+
+const closeDialog = () => {
+  dialogRef.value?.close();
+};
+
+
 </script>
 
 <template>
@@ -48,13 +107,16 @@ getJobs();
       {{ job.title }}
     </p> -->
   </header>
+  <div>
+    <h3 v-for="job in Jobs" :key="job.id"">{{ job.title }}</h3>
+  </div>
 
   <main class="">
     <!-- Mobile Modal -->
     <dialog
       ref="dialogRef"
       id="job-input"
-      class="fixed top-auto rounded-t-xl md:rounded-xl p-6 max-w-md w-full backdrop:backdrop-blur-xs"
+      class="fixed top-auto md:mx-auto md:top-60 rounded-t-xl md:rounded-xl p-6 max-w-md w-full backdrop:backdrop-blur-xs"
     >
       <div class="flex justify-between items-center mb-6">
         <h3 class="font-medium">Lägg till ansökan</h3>
@@ -66,19 +128,20 @@ getJobs();
           <X :size="15" />
         </button>
       </div>
-      <form action="">
+      <form @submit.prevent="InsertJob">
         <div class="grid grid-cols-2">
           <div class="">
             <label
               class="block text-xs uppercase font-semibold text-gray-500 mb-1"
-              for="title"
+              for="company"
               >Företag *</label
             >
             <input
               class="border w-35 outline-none border-gray-400 bg-gray-100 rounded-lg pl-1 h-7"
               type="text"
-              name="title"
-              id="title"
+              v-model="form.company"
+              name="company"
+              id="company"
               required
               placeholder="Spotify"
             />
@@ -86,14 +149,15 @@ getJobs();
           <div class="">
             <label
               class="block text-xs uppercase font-semibold text-gray-400 mb-1"
-              for="role"
+              for="title"
               >Roll *</label
             >
             <input
               class="border w-40 outline-none border-gray-400 bg-gray-100 rounded-lg pl-1 h-7"
               type="text"
-              name="role"
-              id="role"
+              v-model="form.title"
+              name="title"
+              id="title"
               required
               placeholder="Frontend Developer"
             />
@@ -110,7 +174,8 @@ getJobs();
             <input
               class="border w-35 outline-none border-gray-400 bg-gray-100 rounded-lg pl-1 h-7"
               type="date"
-              name="date"
+              v-model="form.created_at"
+              name="created_at"
               id="date"
             />
           </div>
@@ -122,6 +187,7 @@ getJobs();
             >
             <select
               name="status"
+              v-model="form.status"
               id="status"
               class="border w-35 outline-none border-gray-400 bg-gray-100 rounded-lg pl-1 h-7"
             >
@@ -136,20 +202,22 @@ getJobs();
         <div class="mt-6">
           <label
             class="block text-xs uppercase font-semibold text-gray-400 mb-1"
-            for="link"
+            for="url"
             >Länk</label
           >
           <input
             class="border w-full outline-none border-gray-400 bg-gray-100 rounded-lg pl-1 h-7"
             type="text"
-            name="link"
-            id="link"
+            v-model="form.url"
+            name="url"
+            id="url"
             placeholder="https://..."
           />
         </div>
 
         <div class="mt-7 flex justify-evenly gap-3 items-center">
           <button
+            v-on:click="closeDialog"
             type="button"
             class="border text-gray-500 border-gray-200 p-1 w-40 rounded-xl"
           >
