@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted} from "vue";
+import { ref, onMounted, computed } from "vue";
 import { supabase } from "../utils/supabase";
 import { BriefcaseBusinessIcon, Plus, X } from "@lucide/vue";
-
 
 type jobtype = {
   id: number;
@@ -23,8 +22,6 @@ async function getJobs() {
   console.log("Error", error);
 }
 
-
-
 const form = ref({
   company: "",
   title: "",
@@ -35,13 +32,13 @@ const form = ref({
 
 const resetForm = () => {
   form.value = {
-     company: "",
+    company: "",
     title: "",
     created_at: new Date().toISOString().split("T")[0],
     status: "",
     url: "",
-  }
-}
+  };
+};
 
 const InsertJob = async () => {
   try {
@@ -64,7 +61,7 @@ const InsertJob = async () => {
 
     await getJobs();
 
-    resetForm()
+    resetForm();
     dialogRef.value?.close();
   } catch (error) {
     console.error("Kunde inte spara datan", error);
@@ -73,7 +70,7 @@ const InsertJob = async () => {
 
 onMounted(() => {
   getJobs();
-})
+});
 
 const dialogRef = ref<HTMLDialogElement | null>(null);
 
@@ -81,7 +78,21 @@ const closeDialog = () => {
   dialogRef.value?.close();
 };
 
+const soktCount = computed(() => {
+  return Jobs.value.filter((job) => job.status === "sökt").length;
+});
 
+const intervjuCount = computed(() => {
+  return Jobs.value.filter((job) => job.status === "intervju").length;
+});
+
+const ejVidareCount = computed(() => {
+  return Jobs.value.filter((job) => job.status === "ej_vidare").length;
+});
+
+const erbjudandeCount = computed(() => {
+  return Jobs.value.filter((job) => job.status === "erbjudande").length;
+});
 </script>
 
 <template>
@@ -102,16 +113,49 @@ const closeDialog = () => {
         <Plus :size="20" /> Ny
       </button>
     </div>
-    <h1 class="text-red-500">Hello World</h1>
+
     <!-- <p class="text-blue-500" v-for="job in Jobs" :key="job.id">
       {{ job.title }}
     </p> -->
   </header>
+  <section class="flex justify-center items-center gap-2 overflow-hidden mt-5">
+    <div
+      class="border border-gray-300 py-6 px-6.5 rounded-2xl bg-gray-50 w-min-[90px] flex flex-col items-center"
+    >
+      <span class="w-2 h-2 rounded-full bg-blue-500 block"></span>
+      <span class="font-medium mt-1">{{ soktCount }}</span>
+      <span class="text-xs text-gray-500 font-medium">Sökt</span>
+    </div>
+
+    <div
+      class="border border-gray-300 py-6 px-4 rounded-2xl bg-gray-50 flex flex-col items-center"
+    >
+      <span class="w-2 h-2 rounded-full bg-yellow-500 block"></span>
+      <span class="font-medium mt-1">{{ intervjuCount }}</span>
+      <span class="text-xs text-gray-500 font-medium">Intervju</span>
+    </div>
+
+    <div
+      class="border border-gray-300 py-6 px-3 rounded-2xl bg-gray-50 flex flex-col items-center"
+    >
+      <span class="w-2 h-2 rounded-full bg-red-500 block"></span>
+      <span class="font-medium mt-1">{{ ejVidareCount }}</span>
+      <span class="text-xs text-gray-500 font-medium">Ej Vidare</span>
+    </div>
+
+    <div
+      class="border border-gray-300 py-6 px-1.5 rounded-2xl bg-gray-50 flex flex-col items-center"
+    >
+      <span class="w-2 h-2 rounded-full bg-green-500 block"></span>
+      <span class="font-medium mt-1">{{ erbjudandeCount }}</span>
+      <span class="text-xs text-gray-500 font-medium">Erbjudande</span>
+    </div>
+  </section>
   <div>
-    <h3 v-for="job in Jobs" :key="job.id"">{{ job.title }}</h3>
+    <h3 v-for="job in Jobs" :key="job.id">{{ job.title }}</h3>
   </div>
 
-  <main class="">
+  <section class="">
     <!-- Mobile Modal -->
     <dialog
       ref="dialogRef"
@@ -230,5 +274,7 @@ const closeDialog = () => {
         </div>
       </form>
     </dialog>
-  </main>
+  </section>
+
+  <main></main>
 </template>
