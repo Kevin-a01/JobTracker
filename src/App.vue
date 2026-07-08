@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { supabase } from "../utils/supabase";
-import { BriefcaseBusinessIcon, Plus, X } from "@lucide/vue";
+import { BriefcaseBusinessIcon, Plus, Search, X } from "@lucide/vue";
+import JobCard from "./components/jobCard.vue";
 
 type jobtype = {
   id: number;
@@ -9,6 +10,7 @@ type jobtype = {
   company: string;
   url: string;
   status: string;
+  created_at: Date;
 };
 
 const Jobs = ref<jobtype[]>([]);
@@ -79,20 +81,49 @@ const closeDialog = () => {
 };
 
 const soktCount = computed(() => {
-  return Jobs.value.filter((job) => job.status === "sökt").length;
+  return Jobs.value.filter((job) => job.status === "Sökt").length;
 });
 
 const intervjuCount = computed(() => {
-  return Jobs.value.filter((job) => job.status === "intervju").length;
+  return Jobs.value.filter((job) => job.status === "Intervju").length;
 });
 
 const ejVidareCount = computed(() => {
-  return Jobs.value.filter((job) => job.status === "ej_vidare").length;
+  return Jobs.value.filter((job) => job.status === "Ej Vidare").length;
 });
 
 const erbjudandeCount = computed(() => {
-  return Jobs.value.filter((job) => job.status === "erbjudande").length;
+  return Jobs.value.filter((job) => job.status === "Erbjudande").length;
 });
+
+const activeStatus = ref<string>("");
+
+async function getJobsByStatus(valfriStatus: string) {
+  try {
+    let query = supabase.from("jobs").select();
+
+    if (activeStatus.value === valfriStatus) {
+      activeStatus.value = "";
+    } else {
+      activeStatus.value = valfriStatus;
+      query = query.eq("status", valfriStatus);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw new Error();
+
+    if (data) {
+      Jobs.value = data;
+    }
+  } catch (error) {
+    console.error("Det gick ej att filtrera", error);
+  }
+}
+
+function handleJobDeleted(id: number) {
+  Jobs.value = Jobs.value.filter((job) => job.id !== id);
+}
 </script>
 
 <template>
@@ -118,45 +149,65 @@ const erbjudandeCount = computed(() => {
       {{ job.title }}
     </p> -->
   </header>
-  <section class="flex justify-center items-center gap-2 overflow-hidden mt-5">
-    <div
+  <section class="flex justify-evenly items-center gap-2 overflow-hidden mt-3">
+    <button
+      @click="getJobsByStatus('Sökt')"
+      :class="{ 'border-gray-500': activeStatus === 'Sökt' }"
       class="border border-gray-300 py-6 px-6.5 rounded-2xl bg-gray-50 w-min-[90px] flex flex-col items-center"
     >
       <span class="w-2 h-2 rounded-full bg-blue-500 block"></span>
       <span class="font-medium mt-1">{{ soktCount }}</span>
       <span class="text-xs text-gray-500 font-medium">Sökt</span>
-    </div>
+    </button>
 
-    <div
+    <button
+      @click="getJobsByStatus('Intervju')"
+      :class="{ 'border-gray-500': activeStatus === 'Intervju' }"
       class="border border-gray-300 py-6 px-4 rounded-2xl bg-gray-50 flex flex-col items-center"
     >
       <span class="w-2 h-2 rounded-full bg-yellow-500 block"></span>
       <span class="font-medium mt-1">{{ intervjuCount }}</span>
       <span class="text-xs text-gray-500 font-medium">Intervju</span>
-    </div>
+    </button>
 
-    <div
+    <button
+      @click="getJobsByStatus('Ej Vidare')"
+      :class="{ 'border-gray-500': activeStatus === 'Ej Vidare' }"
       class="border border-gray-300 py-6 px-3 rounded-2xl bg-gray-50 flex flex-col items-center"
     >
       <span class="w-2 h-2 rounded-full bg-red-500 block"></span>
       <span class="font-medium mt-1">{{ ejVidareCount }}</span>
       <span class="text-xs text-gray-500 font-medium">Ej Vidare</span>
-    </div>
+    </button>
 
-    <div
+    <button
+      @click="getJobsByStatus('Erbjudande')"
+      :class="{ 'border-gray-500': activeStatus === 'Erbjudande' }"
       class="border border-gray-300 py-6 px-1.5 rounded-2xl bg-gray-50 flex flex-col items-center"
     >
       <span class="w-2 h-2 rounded-full bg-green-500 block"></span>
       <span class="font-medium mt-1">{{ erbjudandeCount }}</span>
       <span class="text-xs text-gray-500 font-medium">Erbjudande</span>
-    </div>
+    </button>
   </section>
-  <div>
-    <h3 v-for="job in Jobs" :key="job.id">{{ job.title }}</h3>
+  <div class="mt-5 relative w-fit mx-auto">
+    <Search :size="18" class="absolute left-1.5 top-2 text-gray-500" />
+    <input
+      type="text"
+      name=""
+      id=""
+      placeholder="Sök företag eller roll..."
+      class="border p-1.5 w-88 pl-7 outline-none border-gray-400 rounded-xl text-sm"
+    />
+
+    <!-- <h3 v-for="job in Jobs" :key="job.id">{{ job.title }}</h3> -->
   </div>
 
+  <section>
+    <JobCard :jobs="Jobs" @job-deleted="handleJobDeleted" />
+  </section>
+
   <section class="">
-    <!-- Mobile Modal -->
     <dialog
       ref="dialogRef"
       id="job-input"
@@ -235,10 +286,10 @@ const erbjudandeCount = computed(() => {
               id="status"
               class="border w-35 outline-none border-gray-400 bg-gray-100 rounded-lg pl-1 h-7"
             >
-              <option value="sökt">Sökt</option>
-              <option value="intervju">Intervju</option>
-              <option value="ej_vidare">Ej Vidare</option>
-              <option value="erbjudande">Erbjudande</option>
+              <option value="Sökt">Sökt</option>
+              <option value="Intervju">Intervju</option>
+              <option value="Ej Vidare">Ej Vidare</option>
+              <option value="Erbjudande">Erbjudande</option>
             </select>
           </div>
         </div>
