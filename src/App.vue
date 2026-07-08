@@ -88,8 +88,8 @@ const intervjuCount = computed(() => {
   return Jobs.value.filter((job) => job.status === "Intervju").length;
 });
 
-const ejVidareCount = computed(() => {
-  return Jobs.value.filter((job) => job.status === "Ej Vidare").length;
+const avslagCount = computed(() => {
+  return Jobs.value.filter((job) => job.status === "Avslag").length;
 });
 
 const erbjudandeCount = computed(() => {
@@ -171,13 +171,13 @@ function handleJobDeleted(id: number) {
     </button>
 
     <button
-      @click="getJobsByStatus('Ej Vidare')"
-      :class="{ 'border-gray-500': activeStatus === 'Ej Vidare' }"
-      class="border border-gray-300 py-6 px-3 rounded-2xl bg-gray-50 flex flex-col items-center"
+      @click="getJobsByStatus('Avslag')"
+      :class="{ 'border-gray-500': activeStatus === 'Avslag' }"
+      class="border border-gray-300 py-6 px-5 rounded-2xl bg-gray-50 flex flex-col items-center"
     >
       <span class="w-2 h-2 rounded-full bg-red-500 block"></span>
-      <span class="font-medium mt-1">{{ ejVidareCount }}</span>
-      <span class="text-xs text-gray-500 font-medium">Ej Vidare</span>
+      <span class="font-medium mt-1">{{ avslagCount }}</span>
+      <span class="text-xs text-gray-500 font-medium">Avslag</span>
     </button>
 
     <button
