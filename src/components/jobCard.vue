@@ -83,7 +83,10 @@ async function deleteJob(id: number) {
         >
           <h2 class="text-sm">{{ job.status }}</h2>
         </div>
-        <button @click="deleteJob(job.id)" class="ml-auto text-gray-500">
+        <button
+          @click="deleteJob(job.id)"
+          class="ml-auto text-gray-500 hover:bg-gray-200 p-1.5 rounded-full"
+        >
           <Trash :size="18" />
         </button>
       </div>

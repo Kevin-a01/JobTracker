@@ -139,7 +139,7 @@ function handleJobDeleted(id: number) {
       <button
         command="show-modal"
         commandFor="job-input"
-        class="bg-black text-white flex items-center gap-1 w-16 h-9 justify-center rounded-2xl ml-auto"
+        class="bg-black text-white flex items-center gap-1 w-16 h-9 justify-center rounded-2xl ml-auto cursor-pointer hover:text-gray-400 transform duration-200 ease-in"
       >
         <Plus :size="20" /> Ny
       </button>
@@ -149,55 +149,63 @@ function handleJobDeleted(id: number) {
       {{ job.title }}
     </p> -->
   </header>
-  <section class="flex justify-evenly items-center gap-2 overflow-hidden mt-3">
+  <section
+    class="flex justify-evenly items-center gap-2 md:justify-center md:gap-7 overflow-hidden mt-3"
+  >
     <button
       @click="getJobsByStatus('Sökt')"
       :class="{ 'border-gray-500': activeStatus === 'Sökt' }"
-      class="border border-gray-300 py-6 px-6.5 rounded-2xl bg-gray-50 w-min-[90px] flex flex-col items-center"
+      class="border border-gray-300 py-6 px-6.5 md:w-100 rounded-2xl bg-gray-50 w-min-[90px] flex flex-col items-center"
     >
-      <span class="w-2 h-2 rounded-full bg-blue-500 block"></span>
+      <span class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-blue-500 block"></span>
       <span class="font-medium mt-1">{{ soktCount }}</span>
-      <span class="text-xs text-gray-500 font-medium">Sökt</span>
+      <span class="md:text-lg text-xs text-gray-500 font-medium">Sökt</span>
     </button>
 
     <button
       @click="getJobsByStatus('Intervju')"
       :class="{ 'border-gray-500': activeStatus === 'Intervju' }"
-      class="border border-gray-300 py-6 px-4 rounded-2xl bg-gray-50 flex flex-col items-center"
+      class="border border-gray-300 py-6 px-4 rounded-2xl md:w-100 bg-gray-50 flex flex-col items-center"
     >
-      <span class="w-2 h-2 rounded-full bg-yellow-500 block"></span>
-      <span class="font-medium mt-1">{{ intervjuCount }}</span>
-      <span class="text-xs text-gray-500 font-medium">Intervju</span>
+      <span
+        class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-yellow-500 block"
+      ></span>
+      <span class="font-medium mt-1 md:text-lg">{{ intervjuCount }}</span>
+      <span class="md:text-lg text-xs text-gray-500 font-medium">Intervju</span>
     </button>
 
     <button
       @click="getJobsByStatus('Avslag')"
       :class="{ 'border-gray-500': activeStatus === 'Avslag' }"
-      class="border border-gray-300 py-6 px-5 rounded-2xl bg-gray-50 flex flex-col items-center"
+      class="border border-gray-300 py-6 px-5 md:w-100 rounded-2xl bg-gray-50 flex flex-col items-center"
     >
-      <span class="w-2 h-2 rounded-full bg-red-500 block"></span>
-      <span class="font-medium mt-1">{{ avslagCount }}</span>
-      <span class="text-xs text-gray-500 font-medium">Avslag</span>
+      <span class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-red-500 block"></span>
+      <span class="font-medium mt-1 md:text-lg">{{ avslagCount }}</span>
+      <span class="md:text-lg text-xs text-gray-500 font-medium">Avslag</span>
     </button>
 
     <button
       @click="getJobsByStatus('Erbjudande')"
       :class="{ 'border-gray-500': activeStatus === 'Erbjudande' }"
-      class="border border-gray-300 py-6 px-1.5 rounded-2xl bg-gray-50 flex flex-col items-center"
+      class="border border-gray-300 md:w-100 py-6 px-1.5 rounded-2xl bg-gray-50 flex flex-col items-center"
     >
-      <span class="w-2 h-2 rounded-full bg-green-500 block"></span>
-      <span class="font-medium mt-1">{{ erbjudandeCount }}</span>
-      <span class="text-xs text-gray-500 font-medium">Erbjudande</span>
+      <span
+        class="w-2 h-2 md:w-4 md:h-4 rounded-full bg-green-500 block"
+      ></span>
+      <span class="font-medium md:text-lg mt-1">{{ erbjudandeCount }}</span>
+      <span class="md:text-lg text-xs text-gray-500 font-medium"
+        >Erbjudande</span
+      >
     </button>
   </section>
-  <div class="mt-5 relative w-fit mx-auto">
-    <Search :size="18" class="absolute left-1.5 top-2 text-gray-500" />
+  <div class="mt-5 mb-1 relative w-fit mx-auto">
+    <Search :size="18" class="absolute left-1.5 top-2.5 text-gray-500" />
     <input
       type="text"
       name=""
       id=""
       placeholder="Sök företag eller roll..."
-      class="border p-1.5 w-88 pl-7 outline-none border-gray-400 rounded-xl text-sm"
+      class="border p-1.5 w-88 pl-7 outline-none border-gray-400 rounded-xl"
     />
 
     <!-- <h3 v-for="job in Jobs" :key="job.id">{{ job.title }}</h3> -->
