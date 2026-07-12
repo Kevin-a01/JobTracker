@@ -124,6 +124,21 @@ async function getJobsByStatus(valfriStatus: string) {
 function handleJobDeleted(id: number) {
   Jobs.value = Jobs.value.filter((job) => job.id !== id);
 }
+
+async function updateStatus(id: number, newStatus: string) {
+  const { error } = await supabase
+    .from("jobs")
+    .update({ status: newStatus })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Misslyckades att uppdatera jobb", error.message);
+  }
+
+  Jobs.value = Jobs.value.map((job) =>
+    job.id === id ? { ...job, status: newStatus } : job,
+  );
+}
 </script>
 
 <template>
@@ -212,7 +227,11 @@ function handleJobDeleted(id: number) {
   </div>
 
   <section>
-    <JobCard :jobs="Jobs" @job-deleted="handleJobDeleted" />
+    <JobCard
+      :jobs="Jobs"
+      @job-deleted="handleJobDeleted"
+      @status-updated="updateStatus"
+    />
   </section>
 
   <section class="">

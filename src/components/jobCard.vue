@@ -16,7 +16,7 @@ defineProps<{
   jobs: jobtype[];
 }>();
 
-const emit = defineEmits(["job-deleted"]);
+const emit = defineEmits(["job-deleted", "status-updated"]);
 
 const Jobs = ref<jobtype[]>([]);
 
@@ -40,6 +40,12 @@ const statusColors: Record<string, string> = {
 }
 
 getJobs(); */
+
+function onStatusChange(id: number, event: Event) {
+  const target = event.target as HTMLSelectElement;
+
+  emit("status-updated", id, target.value);
+}
 
 async function deleteJob(id: number) {
   const { error } = await supabase.from("jobs").delete().eq("id", id);
@@ -101,6 +107,21 @@ async function deleteJob(id: number) {
           })
         }}
       </h3>
+
+      <div class="border border-gray-400 w-fit mt-5 ml-1 text-sm rounded-lg">
+        <select
+          :value="job.status"
+          class="text-center outline-none appearance-none"
+          name="status"
+          @change="onStatusChange(job.id, $event)"
+          id=""
+        >
+          <option value="Sökt">Sökt</option>
+          <option value="Intervju">Intervju</option>
+          <option value="Avslag">Avslag</option>
+          <option value="Erbjudande">Erbjudande</option>
+        </select>
+      </div>
     </div>
   </div>
 </template>
