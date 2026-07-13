@@ -139,6 +139,22 @@ async function updateStatus(id: number, newStatus: string) {
     job.id === id ? { ...job, status: newStatus } : job,
   );
 }
+
+let searchInput = ref("");
+
+const filteredJobs = computed(() => {
+  const query = searchInput.value.toLowerCase().trim();
+
+  if (!query) {
+    return Jobs.value;
+  }
+  return Jobs.value.filter((job) => {
+    const matchCompany = job.company.toLowerCase().includes(query);
+    const matchTitle = job.title.toLowerCase().includes(query);
+
+    return matchCompany || matchTitle;
+  });
+});
 </script>
 
 <template>
@@ -216,6 +232,7 @@ async function updateStatus(id: number, newStatus: string) {
   <div class="mt-5 mb-1 relative w-fit mx-auto">
     <Search :size="18" class="absolute left-1.5 top-2.5 text-gray-500" />
     <input
+      v-model="searchInput"
       type="text"
       name=""
       id=""
@@ -228,7 +245,7 @@ async function updateStatus(id: number, newStatus: string) {
 
   <section>
     <JobCard
-      :jobs="Jobs"
+      :jobs="filteredJobs"
       @job-deleted="handleJobDeleted"
       @status-updated="updateStatus"
     />
